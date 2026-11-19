@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CipherRoom — Obrolan Privat Terenkripsi End-to-End</title>
+    <meta name="description"
+        content="CipherRoom: obrolan real-time dengan kode ruang. Pesan dienkripsi di perangkatmu dengan AES-256-GCM, server hanya meneruskannya.">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%2316121B'/%3E%3Ccircle cx='20' cy='20' r='14' fill='none' stroke='%23F2B93B' stroke-width='1.8' stroke-dasharray='2 4'/%3E%3Ccircle cx='20' cy='20' r='8.5' fill='none' stroke='%237CCAA6' stroke-width='1.6'/%3E%3Ccircle cx='20' cy='20' r='3.2' fill='%23F2B93B'/%3E%3C/svg%3E">
+
+    <!-- Anti-flicker Theme Initialization: Default Light Theme -->
+    <script>
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem("cr-theme"); } catch (e) { }
+            if (t !== "light" && t !== "dark") {
+                t = "light";
+            }
+            document.documentElement.setAttribute("data-theme", t);
+        })();
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ========================================================================
+       Top Navigation Bar
+       ======================================================================== -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar" id="navbar">
+                <!-- Logo with Signature Orbital Rings Emblem -->
+                <a href="#home" class="nav-brand">
+                    <div class="brand-icon">
+                        <svg viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="14" stroke="#F2B93B" stroke-width="1.8" stroke-dasharray="2 4" />
+                            <circle cx="20" cy="20" r="8.5" stroke="#7CCAA6" stroke-width="1.6" />
+                            <circle cx="20" cy="20" r="3.2" fill="#F2B93B" />
+                        </svg>
+                    </div>
+                    <span>CipherRoom</span>
+                    <span class="brand-version">v2.0</span>
+                </a>
+
+                <!-- Desktop Navigation Menu -->
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#security" class="nav-link">Security</a></li>
+                    <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                </ul>
+
+                <!-- Action Buttons & Theme Switcher -->
+                <div class="nav-actions">
+                    <!-- Theme Toggle Button (Light / Dark) -->
+                    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme"
+                        title="Ganti Tema (Light / Dark)">
+                        <!-- Moon Icon (shown in light mode to switch to dark) -->
+                        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <!-- Sun Icon (shown in dark mode to switch to light) -->
+                        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+
+                    <a href="https://chiperroom.layka.my.id/" target="_blank" rel="noopener noreferrer"
+                        class="btn btn-primary">Get Started</a>
+
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Buka menu navigasi">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========================================================================
+         Hero Section
+         ======================================================================== -->
+        <section class="section hero" id="home">
+            <div class="container">
+                <div class="hero-grid">
+                    <!-- Left Column: Copy & CTAs -->
+                    <div class="hero-content">
+                        <div class="hero-tag">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <span>Zero-Knowledge Architecture</span>
+                        </div>
+
+                        <h1 class="hero-title">
+                            Your Conversations.
+                            <span class="text-primary-gradient">Your Privacy.</span>
+                        </h1>
+
+                        <p class="hero-description">
+                            Experience private conversations with CipherRoom. Connect, communicate, and keep your
+                            conversations protected using client-side cryptographic guarantees.
+                        </p>
+
+                        <div class="hero-buttons">
+                            <a href="https://chiperroom.layka.my.id/" target="_blank" rel="noopener noreferrer"
+                                class="btn btn-primary btn-lg">
+                                <span>Start Chatting</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </a>
+                            <a href="#features" class="btn btn-soft btn-lg">Explore Features</a>
+                        </div>
+
+                        <div class="hero-trust-list">
+                            <div class="trust-item">
+                                <span class="trust-icon">✓</span>
+                                <span>Pesan Dienkripsi di Perangkatmu, Server Hanya Meneruskannya</span>
+                            </div>
+                            <div class="trust-item">
+                                <span class="trust-icon">✓</span>
+                                <span>150,000 PBKDF2 Iterations Key Handshake</span>
+                            </div>
+                            <div class="trust-item">
+                                <span class="trust-icon">✓</span>
+                                <span>Pure In-Browser WebCrypto AES-256-GCM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Interactive Chat Neumorphic Visual -->
+                    <div class="hero-visual">
+                        <div class="chat-card">
+                            <!-- Window Bar -->
+                            <div class="chat-window-bar">
+                                <div class="window-dots">
+                                    <span class="dot dot-red"></span>
+                                    <span class="dot dot-yellow"></span>
+                                    <span class="dot dot-green"></span>
+                                </div>
+                                <div class="chat-room-info">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    <span>Ruang: #vault-layka</span>
+                                </div>
+                                <div class="status-badge">
+                                    <span class="status-dot-pulse"></span>
+                                    <span>E2EE Aktif</span>
+                                </div>
+                            </div>
+
+                            <!-- Cryptographic Handshake Notice -->
+                            <div class="handshake-banner">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5"></path>
+                                    <circle cx="7.5" cy="15.5" r="5.5"></circle>
+                                </svg>
+                                <span>Kunci Sesi: PBKDF2 (150,000 iters) dengan SHA-256 di browser</span>
+                            </div>
+
+                            <!-- Chat Messages Stream -->
+                            <div class="chat-conversation" id="chatStream">
+                                <!-- Incoming Message (Alice) -->
+                                <div class="chat-msg incoming">
+                                    <div class="msg-header">
+                                        <span>Alice</span>
+                                        <span>• 10:42 AM</span>
+                                    </div>
+                                    <div class="msg-bubble">
+                                        Halo Layka! Apakah kunci obrolan kita benar-benar dibuat langsung di browser?
+                                    </div>
+                                    <div class="msg-footer">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                        <span>Didekripsi secara lokal dengan AES-256-GCM</span>
+                                    </div>
+                                </div>
+
+                                <!-- Outgoing Message (You) -->
+                                <div class="chat-msg outgoing">
+                                    <div class="msg-header">
+                                        <span>You • 10:43 AM</span>
+                                    </div>
+                                    <div class="msg-bubble">
+                                        Benar! Server hanya meneruskan ciphertext mentah. Nol akses ke plaintext.
+                                    </div>
+                                    <div class="msg-footer">
+                                        <span>✓✓ Terenkripsi dengan tag autentikasi</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Raw Ciphertext Inspector (Shows technical proof) -->
+                            <div class="ciphertext-inspector">
+                                <div class="inspector-header">
+                                    <span>Server Relay View (Socket Payload)</span>
+                                    <span class="code-badge">AES-256-GCM</span>
+                                </div>
+                                <div class="ciphertext-code" id="cipherCode">
+                                    { "iv": "3f8e4c91a0b2d4...", "tag": "e1f2a3b4c5...", "ciphertext":
+                                    "89f3bc17e8249a0d8174e92b8d41cf" }
+                                </div>
+                            </div>
+
+                            <!-- Simulated Message Input -->
+                            <form class="chat-input-bar" id="mockChatForm" onsubmit="return false;">
+                                <input type="text" class="chat-input-field" id="mockInput"
+                                    placeholder="Ketik pesan terenkripsi..." autocomplete="off">
+                                <button type="submit" class="chat-send-btn" id="mockSendBtn"
+                                    aria-label="Kirim pesan tes">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         Core Metric Highlights Bar
+         ======================================================================== -->
+        <section class="metrics-section">
+            <div class="container">
+                <div class="metrics-bar">
+                    <div class="metric-item">
+                        <span class="metric-number">AES-256</span>
+                        <span class="metric-label">Cipher GCM Militer</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-number">150,000</span>
+                        <span class="metric-label">Iterasi PBKDF2 SHA-256</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-number">0 Bytes</span>
+                        <span class="metric-label">Plaintext Disimpan di Server</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-number">&lt; 15 ms</span>
+                        <span class="metric-label">Latensi Real-Time Socket.IO</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         Features Section
+         ======================================================================== -->
+        <section class="section" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-tag">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                            </polygon>
+                        </svg>
+                        <span>Kemampuan Arsitektur</span>
+                    </div>
+                    <h2 class="section-title">Dirancang untuk Kerahasiaan Mutlak</h2>
+                    <p class="section-subtitle">Setiap fitur dibangun dengan filosofi zero-trust tanpa mengorbankan
+                        kecepatan kirim obrolan real-time.</p>
+                </div>
+
+                <div class="features-grid">
+                    <!-- Card 1 -->
+                    <div class="nm-raised feature-card">
+                        <div class="feature-top">
+                            <div class="feature-icon-box"
+                                style="background: var(--accent-subtle); color: var(--accent);">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                            </div>
+                            <span class="feature-badge">Web Crypto API</span>
+                        </div>
+                        <h3 class="feature-title">End-to-End Encryption</h3>
+                        <p class="feature-desc">Semua pesan dienkripsi dan didekripsi langsung di perambanmu menggunakan
+                            cipher terotentikasi AES-256-GCM. Teks asli tidak pernah meninggalkan perangkatmu.</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="nm-raised feature-card">
+                        <div class="feature-top">
+                            <div class="feature-icon-box"
+                                style="background: var(--accent-subtle); color: var(--accent);">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                            </div>
+                            <span class="feature-badge">Socket.IO</span>
+                        </div>
+                        <h3 class="feature-title">Real-Time Messaging</h3>
+                        <p class="feature-desc">Komunikasi dua arah sub-milidetik berbasis WebSocket &amp; Socket.IO.
+                            Nikmati pertukaran pesan instan tanpa beban polling berkala.</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="nm-raised feature-card">
+                        <div class="feature-top">
+                            <div class="feature-icon-box" style="background: var(--sage-bg); color: var(--sage);">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="7.5" cy="15.5" r="5.5"></circle>
+                                    <path d="M21 2l-6.5 6.5"></path>
+                                    <path d="M16 3l3 3"></path>
+                                </svg>
+                            </div>
+                            <span class="feature-badge">150,000 Rounds</span>
+                        </div>
+                        <h3 class="feature-title">PBKDF2 Key Derivation</h3>
+                        <p class="feature-desc">Frasa sandi ruang melalui 150.000 iterasi PBKDF2 dengan SHA-256 dan
+                            garam kriptografis unik, menjadikannya kebal dari serangan brute-force berbasis GPU.</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="nm-raised feature-card">
+                        <div class="feature-top">
+                            <div class="feature-icon-box" style="background: var(--danger-bg); color: var(--danger);">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="feature-badge">Zero Storage</span>
+                        </div>
+                        <h3 class="feature-title">Ephemeral Rooms</h3>
+                        <p class="feature-desc">Tidak ada pelacakan database, tidak ada pencatatan disk. Ruang obrolan
+                            dan penyangga pesan hanya ada di memori aktif saat sesi berlangsung.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         Security Section ("Privacy Is Not Optional")
+         ======================================================================== -->
+        <section class="section" id="security">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-tag">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>Integritas Kriptografi</span>
+                    </div>
+                    <h2 class="section-title">Privacy Is Not Optional.</h2>
+                    <p class="section-subtitle">Garansi kriptografis sisi peramban yang dapat diverifikasi secara
+                        transparan. Privasi dibuktikan lewat matematika komputasi murni.</p>
+                </div>
+
+                <div class="security-grid">
+                    <!-- Left Column: Pipeline Card -->
+                    <div class="nm-raised-card pipeline-card">
+                        <h3 class="pipeline-card-title">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)"
+                                stroke-width="2.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span>Alur Kriptografi Sisi-Klien</span>
+                        </h3>
+
+                        <div class="pipeline-steps">
+                            <!-- Step 1 -->
+                            <div class="pipeline-step-item">
+                                <div class="step-num-badge">01</div>
+                                <div class="step-info">
+                                    <div class="step-title">Passphrase Salt &amp; Derivasi Kunci</div>
+                                    <div class="step-tech">PBKDF2-HMAC-SHA256 • 150,000 Iterasi</div>
+                                    <div class="step-desc">Mengubah frasa sandi menjadi kunci enkripsi 256-bit
+                                        berentropi tinggi murni di dalam memori browser.</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="pipeline-step-item">
+                                <div class="step-num-badge">02</div>
+                                <div class="step-info">
+                                    <div class="step-title">Enkripsi AES-256-GCM &amp; IV Unik</div>
+                                    <div class="step-tech">IV 96-bit Unik Dihasilkan Per Pesan</div>
+                                    <div class="step-desc">Memastikan keunikan cipher dan menghasilkan tag autentikasi
+                                        128-bit untuk mendeteksi manipulasi data.</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="pipeline-step-item">
+                                <div class="step-num-badge">03</div>
+                                <div class="step-info">
+                                    <div class="step-title">Transportasi TLS &amp; Socket Relay</div>
+                                    <div class="step-tech">Hanya Ciphertext yang Ditransmisikan</div>
+                                    <div class="step-desc">Server merelay payload biner terenkripsi antar pengguna tanpa
+                                        memiliki kunci pembuka rahasia.</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="pipeline-step-item">
+                                <div class="step-num-badge">04</div>
+                                <div class="step-info">
+                                    <div class="step-title">Dekripsi Terotentikasi di Rekan Obrolan</div>
+                                    <div class="step-tech">Validasi Tag Kriptografi di Peramban Rekan</div>
+                                    <div class="step-desc">Memvalidasi tag autentikasi sebelum menampilkan teks asli.
+                                        Ciphertext yang diubah akan langsung ditolak.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: 4 Security Pillar Cards -->
+                    <div class="pillars-stack">
+                        <!-- Pillar 1 -->
+                        <div class="pillar-card">
+                            <h4 class="pillar-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                                <span>AES-256-GCM Authenticated Encryption</span>
+                            </h4>
+                            <p class="pillar-desc">Galois/Counter Mode memberikan kerahasiaan sekaligus proteksi
+                                integritas payload secara real-time.</p>
+                        </div>
+
+                        <!-- Pillar 2 -->
+                        <div class="pillar-card">
+                            <h4 class="pillar-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2">
+                                    <circle cx="7.5" cy="15.5" r="5.5"></circle>
+                                    <path d="M21 2l-6.5 6.5"></path>
+                                    <path d="M16 3l3 3"></path>
+                                </svg>
+                                <span>Derivasi Kunci PBKDF2 (150k Iterasi)</span>
+                            </h4>
+                            <p class="pillar-desc">Peregangan kunci meningkatkan beban komputasi secara eksponensial
+                                terhadap serangan kamus dan brute-force.</p>
+                        </div>
+
+                        <!-- Pillar 3 -->
+                        <div class="pillar-card">
+                            <h4 class="pillar-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                                </svg>
+                                <span>Eksekusi Terisolasi di Browser</span>
+                            </h4>
+                            <p class="pillar-desc">Kunci kriptografi hanya hidup di sandbox memori browser. Tidak ada
+                                material privat yang tersimpan di server.</p>
+                        </div>
+
+                        <!-- Pillar 4 -->
+                        <div class="pillar-card">
+                            <h4 class="pillar-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                <span>Transparan &amp; Open Source</span>
+                            </h4>
+                            <p class="pillar-desc">Kode sumber terbuka tersedia di GitHub. Anda dapat mengaudit langsung
+                                implementasi derivasi kunci dan alur paket socket.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         How It Works Section
+         ======================================================================== -->
+        <section class="section" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-tag">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 14 14"></polyline>
+                        </svg>
+                        <span>Alur Tiga Langkah</span>
+                    </div>
+                    <h2 class="section-title">Bagaimana CipherRoom Bekerja</h2>
+                    <p class="section-subtitle">Tanpa pendaftaran akun, tanpa nomor telepon, dan tanpa cookie pelacak.
+                        Mulai dalam hitungan detik.</p>
+                </div>
+
+                <div class="steps-grid">
+                    <!-- Step 1 -->
+                    <div class="nm-raised step-card">
+                        <div class="step-big-badge">01</div>
+                        <h3 class="step-card-title">Buat Ruang Obrolan</h3>
+                        <p class="step-card-desc">Tentukan nama atau kode ruang dan masukkan frasa kunci rahasiamu.
+                            Kunci enkripsi langsung diderivasi di perangkatmu.</p>
+                        <div class="step-preview-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <circle cx="7.5" cy="15.5" r="5.5"></circle>
+                                <path d="M21 2l-6.5 6.5"></path>
+                            </svg>
+                            <span>PBKDF2 Client Generation</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="nm-raised step-card">
+                        <div class="step-big-badge">02</div>
+                        <h3 class="step-card-title">Bagikan ke Rekanmu</h3>
+                        <p class="step-card-desc">Kirim kode ruang dan frasa kunci rahasia ke rekan bicaramu melalui
+                            saluran terpercaya atau secara langsung.</p>
+                        <div class="step-preview-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <span>Handshake Socket Instan</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="nm-raised step-card">
+                        <div class="step-big-badge">03</div>
+                        <h3 class="step-card-title">Mulai Obrolan Privat</h3>
+                        <p class="step-card-desc">Kirim pesan terenkripsi secara real-time. Begitu semua anggota keluar,
+                            seluruh data sesi di memori langsung dibersihkan.</p>
+                        <div class="step-preview-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span>Zero-Footprint Memory Purge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         Call To Action (CTA) Section
+         ======================================================================== -->
+        <section class="cta-section" id="cta">
+            <div class="container">
+                <div class="cta-card">
+                    <h2 class="cta-title">Siap untuk Percakapan yang Lebih Privat?</h2>
+                    <p class="cta-desc">Mulai obrolan terenkripsi dengan CipherRoom sekarang. Gratis, open-source, dan
+                        dilindungi enkripsi AES-256-GCM langsung di perambanmu.</p>
+
+                    <div class="cta-buttons">
+                        <a href="https://chiperroom.layka.my.id/" target="_blank" rel="noopener noreferrer"
+                            class="btn btn-primary btn-lg">
+                            <span>Enter CipherRoom</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/layka-cd/Chiperroom" target="_blank" rel="noopener noreferrer"
+                            class="btn btn-soft btn-lg">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                            </svg>
+                            <span>GitHub Repository</span>
+                        </a>
+                    </div>
+
+                    <div class="cta-notice">
+                        🔒 Tanpa Pendaftaran Akun • Eksekusi WebCrypto Murni • Lisensi Open Source MIT
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================================================
+       Footer
+       ======================================================================== -->
+    <footer class="footer" id="about">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Col 1: Brand Info -->
+                <div class="footer-brand-col">
+                    <div class="footer-brand-title">
+                        <div class="brand-icon" style="width: 32px; height: 32px; border-radius: 8px;">
+                            <svg viewBox="0 0 40 40" fill="none" style="width: 22px; height: 22px;">
+                                <circle cx="20" cy="20" r="14" stroke="#F2B93B" stroke-width="1.8"
+                                    stroke-dasharray="2 4" />
+                                <circle cx="20" cy="20" r="8.5" stroke="#7CCAA6" stroke-width="1.6" />
+                                <circle cx="20" cy="20" r="3.2" fill="#F2B93B" />
+                            </svg>
+                        </div>
+                        <span>CipherRoom</span>
+                    </div>
+                    <p class="footer-brand-desc">
+                        Aplikasi perpesanan privat real-time berbasis kode ruang dengan enkripsi end-to-end tanpa
+                        penyimpanan riwayat di server.
+                    </p>
+                    <span class="footer-mit-pill">Lisensi Open Source MIT</span>
+                </div>
+
+                <!-- Col 2: Navigation -->
+                <div class="footer-col">
+                    <div class="footer-col-title">Navigasi</div>
+                    <ul class="footer-links">
+                        <li><a href="#home" class="footer-link">Home</a></li>
+                        <li><a href="#features" class="footer-link">Fitur Utama</a></li>
+                        <li><a href="#security" class="footer-link">Arsitektur Keamanan</a></li>
+                        <li><a href="#how-it-works" class="footer-link">Cara Kerja</a></li>
+                        <li><a href="https://chiperroom.layka.my.id/" target="_blank" rel="noopener noreferrer"
+                                class="footer-link">Buka Aplikasi</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Cryptography -->
+                <div class="footer-col">
+                    <div class="footer-col-title">Kriptografi</div>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt"
+                                class="footer-link" target="_blank" rel="noopener noreferrer">
+                                AES-256-GCM Cipher
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveKey"
+                                class="footer-link" target="_blank" rel="noopener noreferrer">
+                                PBKDF2-HMAC-SHA256
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.rfc-editor.org/rfc/rfc8018" class="footer-link" target="_blank"
+                                rel="noopener noreferrer">
+                                150.000 Iterasi
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.w3.org/TR/WebCryptoAPI/" class="footer-link" target="_blank"
+                                rel="noopener noreferrer">
+                                W3C Web Crypto API
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://en.wikipedia.org/wiki/Zero-knowledge_proof" class="footer-link"
+                                target="_blank" rel="noopener noreferrer">
+                                Zero-Knowledge Relay
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Col 4: Project Info -->
+                <div class="footer-col">
+                    <div class="footer-col-title">Repositori &amp; App</div>
+                    <ul class="footer-links">
+                        <li><a href="https://github.com/layka-cd/Chiperroom" target="_blank" rel="noopener noreferrer"
+                                class="footer-link">GitHub: layka-cd/Chiperroom</a></li>
+                        <li><a href="https://chiperroom.layka.my.id/" target="_blank" rel="noopener noreferrer"
+                                class="footer-link">Live App: chiperroom.layka.my.id</a></li>
+                        <li>
+                            <a href="https://nodejs.org/" class="footer-link" target="_blank" rel="noopener noreferrer">
+                                Node.js
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://socket.io/docs/v4/" class="footer-link" target="_blank"
+                                rel="noopener noreferrer">
+                                Socket.IO
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://12factor.net/logs" class="footer-link" target="_blank"
+                                rel="noopener noreferrer">
+                                Zero Log Persistence
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright Bar -->
+            <div class="footer-bottom">
+                <div>&copy; <span id="currentYear"></span> CipherRoom Project by Layka. Dibuat dengan Soft Neumorphism
+                    UI.</div>
+                <div class="footer-bottom-tag">Privacy Is Not Optional 🔒</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================================================
+       JavaScript Interactions & Theme Switcher
+       ======================================================================== -->
+    <script>
+        // Set Current Year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Theme Toggle Handler (Light / Dark)
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            try {
+                localStorage.setItem('cr-theme', next);
+            } catch (e) { }
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleTheme);
+        }
+
+        // Mobile Hamburger Menu Toggle
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navMenu = document.getElementById('navMenu');
+
+        if (hamburgerBtn && navMenu) {
+            hamburgerBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('open');
+            });
+
+            // Close menu when clicking a link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('open');
+                });
+            });
+        }
+
+        // Active Navigation Highlighting on Scroll
+        const sections = document.querySelectorAll('section[id], footer[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let currentSection = '';
+            const scrollPos = window.pageYOffset + 120;
+
+            sections.forEach(section => {
+                const top = section.offsetTop;
+                const height = section.offsetHeight;
+                if (scrollPos >= top && scrollPos < top + height) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Interactive Demo in Hero Chat Visual
+        const mockChatForm = document.getElementById('mockChatForm');
+        const mockInput = document.getElementById('mockInput');
+        const chatStream = document.getElementById('chatStream');
+        const cipherCode = document.getElementById('cipherCode');
+
+        if (mockChatForm && mockInput && chatStream) {
+            mockChatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = mockInput.value.trim();
+                if (!text) return;
+
+                // Generate mock hex strings for IV and ciphertext
+                const randHex = (len) => Array.from({ length: len }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                const iv = randHex(24);
+                const tag = randHex(32);
+                const cipher = randHex(Math.min(text.length * 4, 32)) + '... [AES-256-GCM]';
+
+                // Add user outgoing message
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const userMsg = document.createElement('div');
+                userMsg.className = 'chat-msg outgoing';
+                userMsg.innerHTML = `
+          <div class="msg-header">
+            <span>You • ${timeStr}</span>
+          </div>
+          <div class="msg-bubble">
+            ${escapeHtml(text)}
+          </div>
+          <div class="msg-footer">
+            <span>✓✓ Terenkripsi dengan tag autentikasi</span>
+          </div>
+        `;
+                chatStream.appendChild(userMsg);
+
+                // Update inspector code
+                if (cipherCode) {
+                    cipherCode.textContent = `{ "iv": "${iv}", "tag": "${tag}", "ciphertext": "${cipher}" }`;
+                }
+
+                mockInput.value = '';
+
+                // Auto-scroll chat card
+                chatStream.scrollTop = chatStream.scrollHeight;
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+
+</html>
